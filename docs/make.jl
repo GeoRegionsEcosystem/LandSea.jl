@@ -35,7 +35,7 @@ for file in files
     rm(file)
 end
 
-deploydocs(;
+DocumenterVitepress.deploydocs(;
     repo      = "github.com/GeoRegionsEcosystem/LandSea.jl.git",
     target    = "build", # this is where Vitepress stores its output
     devbranch = "main",
