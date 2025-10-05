@@ -32,10 +32,56 @@ A `LandSeaTopo` type will also contain the following field:
 * `z` - Array containing data regarding the Orographic Height in meters. NaN is outside the bounds of the GeoRegion
 """
 struct LandSeaTopo{FT1<:Real,FT2<:Real} <: LandSeaData
+
     lon :: Vector{FT1}
     lat :: Vector{FT1}
-    lsm :: Array{FT2,2}
-    z   :: Array{FT2,2}
+    lsm :: Union{Vector{FT2},Array{FT2,2}}
+    z   :: Union{Vector{FT2},Array{FT2,2}}
+
+    function LandSeaTopo(
+        lon :: Vector{FT1}, lat :: Vector{FT1},
+        lsm :: Vector{FT2}, z   :: Vector{FT2}
+    ) where {FT1 <: Real, FT2 <: Real}
+        npnt = length(lsm)
+        if (npnt!=length(lon)) || (npnt!=length(lat))
+            error("$(modulelog()) - Longitudes, Latitudes and Unstructured Grid Land-Sea Mask must all have the same length")
+        end
+        npnt = length(z)
+        if (npnt!=length(lon)) || (npnt!=length(lat))
+            error("$(modulelog()) - Longitudes, Latitudes and Unstructured Grid Topography must all have the same length")
+        end
+        return new{FT1,FT2}(lon,lat,lsm,z)
+    end
+
+    function LandSeaTopo(
+        lon :: Vector{FT1}, lat :: Vector{FT1},
+        lsm :: Matrix{FT2}, z   :: Matrix{FT2}
+    ) where {FT1 <: Real, FT2 <: Real}
+        nlon,nlat = size(lsm)
+        if (nlon!=length(lon)) || (nlat!=length(lat))
+            error("$(modulelog()) - The Land-Sea Mask array must be of the same size as the grid defined by the Longitude and Latitude vectors")
+        end
+        nlon,nlat = size(z)
+        if (size(lsm)!=size(z))
+            error("$(modulelog()) - The Topography array must be of the same size as the grid defined by the Longitude and Latitude vectors")
+        end
+        return new{FT1,FT2}(lon,lat,lsm,z)
+    end
+
+    function LandSeaTopo(
+        :: Vector{FT1}, :: Vector{FT1},
+        :: Vector{FT2}, :: Matrix{FT2}
+    ) where {FT1 <: Real, FT2 <: Real}
+        error("$(modulelog()) - The `lsm` and `z` fields must both be vectors or both be matrices")
+    end
+
+    function LandSeaTopo(
+        :: Vector{FT1}, :: Vector{FT1},
+        :: Matrix{FT2}, :: Vector{FT2}
+    ) where {FT1 <: Real, FT2 <: Real}
+        error("$(modulelog()) - The `lsm` and `z` fields must both be vectors or both be matrices")
+    end
+
 end
 
 """
@@ -44,9 +90,31 @@ end
 A LandSea Dataset that contains only information on the land-sea mask and no topography.
 """
 struct LandSeaFlat{FT1<:Real,FT2<:Real} <: LandSeaData
+
     lon :: Vector{FT1}
     lat :: Vector{FT1}
-    lsm :: Array{FT2,2}
+    lsm :: Union{Vector{FT2},Array{FT2,2}}
+
+    function LandSeaFlat(
+        lon :: Vector{FT1}, lat :: Vector{FT1}, lsm :: Vector{FT2}
+    ) where {FT1 <: Real, FT2 <: Real}
+        npnt = length(lsm)
+        if (npnt!=length(lon)) || (npnt!=length(lat))
+            error("$(modulelog()) - Longitudes, Latitudes and Unstructured Grid Land-Sea Mask must all have the same length")
+        end
+        return new{FT1,FT2}(lon,lat,lsm)
+    end
+    
+    function LandSeaFlat(
+        lon :: Vector{FT1}, lat :: Vector{FT1}, lsm :: Matrix{FT2}
+    ) where {FT1 <: Real, FT2 <: Real}
+        nlon,nlat = size(lsm)
+        if (nlon!=length(lon)) || (nlat!=length(lat))
+            error("$(modulelog()) - The Land-Sea Mask array must be of the same size as the grid defined by the Longitude and Latitude vectors")
+        end
+        return new{FT1,FT2}(lon,lat,lsm)
+    end
+
 end
 
 modulelog() = "$(now()) - LandSea.jl"
