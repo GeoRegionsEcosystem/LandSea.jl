@@ -19,7 +19,10 @@ export
 Abstract supertype for LandSea Datasets. All `LandSeaData` types contain the following fields:
 * `lon` - Vector containing the longitude points for the Land-Sea Dataset
 * `lat` - Vector containing the latitude points for the Land-Sea Dataset
-* `lsm` - Array containing data regarding the Land-Sea Mask. 1 is Land, 0 is Ocean, NaN is outside the bounds of the GeoRegion
+* `lsm` - Vector or Array containing data regarding the Land-Sea Mask. 1 is Land, 0 is Ocean, NaN is outside the bounds of the GeoRegion
+
+!!! info
+    If `lsm` is a vector, then `lon`, `lat` and `lsm` all must have the same length
 """
 abstract type LandSeaData end
 
@@ -29,7 +32,10 @@ abstract type LandSeaData end
 A LandSea Dataset that also contains information on the topographic height.
 
 A `LandSeaTopo` type will also contain the following field:
-* `z` - Array containing data regarding the Orographic Height in meters. NaN is outside the bounds of the GeoRegion
+* `z` - Vector or Array containing data regarding the Orographic Height in meters. NaN is outside the bounds of the GeoRegion
+
+!!! info
+    If `z` or `lsm` are vectors, then `lon`, `lat`, `lsm` and `z` all must be vectors of the same length
 """
 struct LandSeaTopo{FT1<:Real,FT2<:Real} <: LandSeaData
 
