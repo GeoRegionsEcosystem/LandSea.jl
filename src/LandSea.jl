@@ -41,8 +41,8 @@ struct LandSeaTopo{FT1<:Real,FT2<:Real} <: LandSeaData
 
     lon :: Vector{FT1}
     lat :: Vector{FT1}
-    lsm :: Union{Vector{FT2},Array{FT2,2}}
-    z   :: Union{Vector{FT2},Array{FT2,2}}
+    lsm :: Union{Vector{FT2},Matrix{FT2}}
+    z   :: Union{Vector{FT2},Matrix{FT2}}
 
     function LandSeaTopo(
         lon :: Vector{FT1}, lat :: Vector{FT1},
