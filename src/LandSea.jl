@@ -19,10 +19,10 @@ export
 Abstract supertype for LandSea Datasets. All `LandSeaData` types contain the following fields:
 * `lon` - Vector containing the longitude points for the Land-Sea Dataset
 * `lat` - Vector containing the latitude points for the Land-Sea Dataset
-* `lsm` - Vector or Array containing data regarding the Land-Sea Mask. 1 is Land, 0 is Ocean, NaN is outside the bounds of the GeoRegion
+* `lsm` - Vector or Matrix containing data regarding the Land-Sea Mask. 1 is Land, 0 is Ocean, NaN is outside the bounds of the GeoRegion.
 
 !!! info
-    If `lsm` is a vector, then `lon`, `lat` and `lsm` all must have the same length
+    If `lsm` is a vector, then `lon`, `lat` and `lsm` all must have the same length. Otherwise if `lsm` is a matrix, then its first and second dimensions are longitude and latitude respectively, and it must have size `length(lon)` and `length(lat)`.
 """
 abstract type LandSeaData end
 
@@ -34,8 +34,17 @@ A LandSea Dataset that also contains information on the topographic height.
 A `LandSeaTopo` type will also contain the following field:
 * `z` - Vector or Array containing data regarding the Orographic Height in meters. NaN is outside the bounds of the GeoRegion
 
+A `LandSeaTopo` type can be created using the function:
+
+    LandSeaTopo(
+        lon :: Vector{FT1},
+        lat :: Vector{FT1},
+        lsm :: Union{Vector{FT2},Matrix{FT2}},
+        z   :: Union{Vector{FT2},Matrix{FT2}}
+    ) where {FT1 <: Real, FT2 <: Real} -> LandSeaTopo
+
 !!! info
-    If `z` or `lsm` are vectors, then `lon`, `lat`, `lsm` and `z` all must be vectors of the same length
+    `z` and `lsm` must both be either (1) vectors or (2) matrices of the same size. If `lsm` and `z` are vectors, then `lon`, `lat`, `lsm` and `z` all must have the same length. Otherwise if `lsm` and `z` are matrices, then their first and second dimensions are longitude and latitude respectively, and they are of size `length(lon)` and `length(lat)`.
 """
 struct LandSeaTopo{FT1<:Real,FT2<:Real} <: LandSeaData
 
@@ -94,6 +103,14 @@ end
     LandSeaFlat <: LandSeaData
 
 A LandSea Dataset that contains only information on the land-sea mask and no topography.
+
+A `LandSeaFlat` type can be created using the function:
+
+    LandSeaFlat(
+        lon :: Vector{FT1},
+        lat :: Vector{FT1},
+        lsm :: Union{Vector{FT2},Matrix{FT2}}
+    ) where {FT1 <: Real, FT2 <: Real} -> LandSeaTopo
 """
 struct LandSeaFlat{FT1<:Real,FT2<:Real} <: LandSeaData
 
@@ -129,6 +146,16 @@ modulelog() = "$(now()) - LandSea.jl"
     getLandSea
 
 An extensible function type to retrieve LandSea Datasets. You can use this function name in your packages if you want to retrieve a specific LandSea dataset.
+
+    getLandSea(
+        ids :: <Dataset Type of Interest>,
+        geo :: GeoRegion
+    ) -> LandSeaData
+
+Arguments
+=========
+- `ids`  : A `struct` type for the dataset of interest (e.g., a [`NASAPrecipitationDataset`](https://georegionsecosystem.github.io/NASAPrecipitation.jl/stable/datasets/intro))
+- `geo`  : A `GeoRegion` structure type
 """
 function getLandSea end
 

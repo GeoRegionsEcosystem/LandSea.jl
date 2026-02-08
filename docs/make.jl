@@ -15,9 +15,8 @@ makedocs(;
     ),
     pages=[
         "Home"            => "index.md",
-        "Getting Started" => "landsea.md",
-        # "Basic Example"   => "example.md",
-        "API List"        => "api.md",
+        "Getting Started" => "basics.md",
+        "Dataset Types"   => "landsea.md",
     ],
 )
 
